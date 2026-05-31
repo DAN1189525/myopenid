@@ -17,16 +17,14 @@ builder.Services.AddDbContext<DBUser>(option =>
     option.UseOpenIddict();
 });
 builder.Services.AddHostedService<Minivovo>();
-// ����Ĭ����֤������ʹ�� OpenIddict ����֤�������
+//     Ĭ    ֤      ʹ   OpenIddict     ֤       
 builder.Services.AddIdentity<Appuser, AppRole>()
     .AddEntityFrameworkStores<DBUser>()
-    .AddDefaultTokenProviders().AddDefaultUI();// ��� ASP.NET Core Identity �������� EF Core �洢
-// ���� OpenIddict��Core (EF Core �洢) + Server (token endpoint ��) + Validation (���ط�������֤)
+    .AddDefaultTokenProviders().AddDefaultUI();//  
 builder.Services.AddOpenIddict()
     .AddCore(options =>
     {
-        // ʹ�� EF Core �洢��ָ�� DbContext
-        options.UseEntityFrameworkCore() // ����չ������Ҫ using OpenIddict.EntityFrameworkCore;
+        options.UseEntityFrameworkCore() //  
                .UseDbContext<DBUser>()
                ;
     })
@@ -35,12 +33,12 @@ builder.Services.AddOpenIddict()
         options.AllowAuthorizationCodeFlow();
 
         options.UseAspNetCore()
-            .EnableStatusCodePagesIntegration()// ʹ OpenIddict �Ĵ�����Ӧ������ȷ�� HTTP ״̬��
-            .EnableRedirectionEndpointPassthrough(); // ������Ȩ�������ض���˵�ֱ�Ӵ��ݵ� ASP.NET Core �ܵ����Ա� Razor Pages ���Դ�������
+            .EnableStatusCodePagesIntegration()// ʹ 
+            .EnableRedirectionEndpointPassthrough(); //      
         options.AddDevelopmentEncryptionCertificate()
             .AddDevelopmentSigningCertificate();
         options.UseSystemNetHttp()
-            .SetProductInformation(typeof(Program).Assembly); // ʹ�� System.Net.Http ���� HTTP ���󣬲����� User-Agent ��Ϣ
+            .SetProductInformation(typeof(Program).Assembly); // ʹ  
         
         
         options.UseWebProviders()
@@ -56,36 +54,33 @@ builder.Services.AddOpenIddict()
     .AddServer(options =>
     {
         options.AllowAuthorizationCodeFlow();
-        // ���ö˵�
-        options.SetTokenEndpointUris("/connect/token")//�����Ҫ���ƶ˵�
-        .SetUserInfoEndpointUris("/connect/userinfo")//�����Ҫ�û���Ϣ�˵�
-        .SetAuthorizationEndpointUris("/connect/authorize")//setAuthorizationEndpointUris("/connect/authorize") // �����Ҫ��Ȩ�˵�
-        .SetEndSessionEndpointUris("/connect/logout");//setEndSessionEndpointUris("/connect/logout") // �����Ҫע���˵�
+        //    ö˵ 
+        options.SetTokenEndpointUris("/connect/token")
+        .SetUserInfoEndpointUris("/connect/userinfo")
+        .SetAuthorizationEndpointUris("/connect/authorize")//setAuthorizationEndpointUris("/connect/authorize") 
+        .SetEndSessionEndpointUris("/connect/logout");//setEndSessionEndpointUris("/connect/logout") 
 
-        options.RegisterScopes(OpenIddictConstants.Permissions.Scopes.Email, OpenIddictConstants.Permissions.Scopes.Roles,OpenIddictConstants.Permissions.Scopes.Profile); // ע����Ҫ��������
+        options.RegisterScopes(OpenIddictConstants.Permissions.Scopes.Email, OpenIddictConstants.Permissions.Scopes.Roles,OpenIddictConstants.Permissions.Scopes.Profile); //        
 
-         // �����Ҫ��Ȩ����
 
         options.AddDevelopmentEncryptionCertificate()
-       .AddDevelopmentSigningCertificate();// ��������ʱ֤�飬������ʹ�ó־�֤��
+       .AddDevelopmentSigningCertificate();//      
 
 
         options.UseAspNetCore()
-               .EnableStatusCodePagesIntegration()// ʹ OpenIddict �Ĵ�����Ӧ������ȷ�� HTTP ״̬��
-               .EnableAuthorizationEndpointPassthrough()// ������Ȩ��������Ȩ�˵�ֱ�Ӵ��ݵ� ASP.NET Core �ܵ����Ա� Razor Pages ���Դ�������
-               .EnableTokenEndpointPassthrough() // �������ƶ˵�ֱ�Ӵ��ݵ� ASP.NET Core �ܵ����Ա� Razor Pages ���Դ�������
-               .EnableTokenEndpointPassthrough()// �������ƶ˵�ֱ�Ӵ��ݵ� ASP.NET Core �ܵ����Ա� Razor Pages ���Դ�������
-               .EnableEndSessionEndpointPassthrough();// ����ע���˵�ֱ�Ӵ��ݵ� ASP.NET Core �ܵ����Ա� Razor Pages ���Դ�������
+               .EnableStatusCodePagesIntegration()// ʹ 
+               .EnableAuthorizationEndpointPassthrough()// 
+               .EnableTokenEndpointPassthrough() // 
+               .EnableTokenEndpointPassthrough()// 
+               .EnableEndSessionEndpointPassthrough();//  
 
     })
     .AddCore(options => { 
-        // ʹ�� EF Core �洢��ָ�� DbContext
-        options.UseEntityFrameworkCore() // ����չ������Ҫ using OpenIddict.EntityFrameworkCore;
+        options.UseEntityFrameworkCore() //  
                .UseDbContext<DBUser>();
     })
     .AddValidation(options =>
     {
-        // ʹ�ñ��ط��������� token ��֤
         options.UseLocalServer();
         options.UseAspNetCore();
     });
@@ -103,7 +98,6 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-// ������������֤�м������������Ȩ
 app.UseAuthentication();
 app.UseAuthorization();
 
