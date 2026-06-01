@@ -21,9 +21,9 @@ namespace WebServiceDD.Controllers
         public readonly IOpenIddictAuthorizationManager _authorizationManager;// 注入OpenIddict授权管理器，以便在授权过程中使用
         public readonly IOpenIddictScopeManager _scopeManager;// 注入OpenIddict范围管理器，以便在授权过程中使用
         public readonly SignInManager<Appuser> _signInManager;// 注入ASP.NET Core Identity的登录管理器，以便在授权过程中使用     
-        public readonly UserManager<AppRole> _userManager;// 注入ASP.NET Core Identity的用户管理器，以便在授权过程中使用
+        public readonly UserManager<Appuser> _userManager;// 注入ASP.NET Core Identity的用户管理器，以便在授权过程中使用
 
-        public AuthorizationController(IOpenIddictApplicationManager applicationManager, IOpenIddictAuthorizationManager authorizationManager, IOpenIddictScopeManager scopeManager, SignInManager<Appuser> signInManager, UserManager<AppRole> userManager)
+        public AuthorizationController(IOpenIddictApplicationManager applicationManager, IOpenIddictAuthorizationManager authorizationManager, IOpenIddictScopeManager scopeManager, SignInManager<Appuser> signInManager, UserManager<Appuser> userManager)
         {
             _applicationManager = applicationManager;
             _authorizationManager = authorizationManager;
@@ -31,8 +31,8 @@ namespace WebServiceDD.Controllers
             _signInManager = signInManager;
             _userManager = userManager;
         }
-
-        [HttpPost("coonect/authorize")]// 处理授权请求的端点
+        [HttpGet("connect/authorize")]
+        [HttpPost("connect/authorize")]// 处理授权请求的端点
         [IgnoreAntiforgeryToken]// 允许跨站请求伪造（CSRF）攻击，因为授权请求通常来自外部客户端
         public async Task<IActionResult> authorize()
         {
@@ -46,7 +46,7 @@ namespace WebServiceDD.Controllers
                 || (request.MaxAge is not null && result.Properties?.IssuedUtc is null && TimeProvider.System.GetUtcNow() - result.Properties.IssuedUtc > TimeSpan.FromSeconds(request.MaxAge.Value) && TempData["IgnoreAuthenticationChallenge"] is null or false))
             // 如果身份验证失败，或者请求中包含登录提示，或者请求的最大年龄为0，或者请求的最大年龄不为null且已过期，并且TempData中没有设置忽略身份验证挑战，则返回一个挑战结果
             {
-                if (!request.HasPromptValue(PromptValues.None))// 如果请求中没有包含"none"提示，则返回一个禁止访问结果，指示用户需要登录
+                if (request.HasPromptValue(PromptValues.None))// 如果请求中没有包含"none"提示，则返回一个禁止访问结果，指示用户需要登录
                 {
                     return Forbid(
                     authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
@@ -56,15 +56,13 @@ namespace WebServiceDD.Controllers
                         [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The user is not logged in."
                     }));// 返回一个禁止访问结果，指示用户需要登录，并且包含错误信息
                 }
+                TempData["IgnoreAuthenticationChallenge"] = true;// 设置TempData中的"IgnoreAuthenticationChallenge"标志为true，以便在后续请求中忽略身份验证挑战
+
+                return Challenge(new AuthenticationProperties
+                {
+                    RedirectUri = Request.PathBase + Request.Path + QueryString.Create(Request.HasFormContentType ? Request.Form : Request.Query)
+                });// 返回一个挑战结果，指示用户需要登录，并且设置重定向URI为当前请求的路径和查询字符串，以便在登录成功后能够正确重定向回授权请求的原始位置
             }
-
-            TempData["IgnoreAuthenticationChallenge"] = true;// 设置TempData中的"IgnoreAuthenticationChallenge"标志为true，以便在后续请求中忽略身份验证挑战
-
-            return Challenge(new AuthenticationProperties
-            {
-                RedirectUri = Request.PathBase + Request.Path + QueryString.Create(Request.HasFormContentType ? Request.Form : Request.Query)
-            });// 返回一个挑战结果，指示用户需要登录，并且设置重定向URI为当前请求的路径和查询字符串，以便在登录成功后能够正确重定向回授权请求的原始位置
-
             #endregion
             #region// 获取授权请求、验证用户身份并处理授权逻辑
             var user = await _userManager.GetUserAsync(result.Principal) ??
@@ -162,10 +160,7 @@ namespace WebServiceDD.Controllers
                     Scope = request.Scope
                 });
             }
-            
             #endregion
-
-            return View();
         }
         private static IEnumerable<string> GetDestinations(Claim claim)
         {

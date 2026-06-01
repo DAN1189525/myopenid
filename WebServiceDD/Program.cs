@@ -39,8 +39,8 @@ builder.Services.AddOpenIddict()
             .AddDevelopmentSigningCertificate();
         options.UseSystemNetHttp()
             .SetProductInformation(typeof(Program).Assembly); // ʹ  
-        
-        
+
+
         options.UseWebProviders()
             .AddGitHub(options =>
             {
@@ -60,7 +60,8 @@ builder.Services.AddOpenIddict()
         .SetAuthorizationEndpointUris("/connect/authorize")//setAuthorizationEndpointUris("/connect/authorize") 
         .SetEndSessionEndpointUris("/connect/logout");//setEndSessionEndpointUris("/connect/logout") 
 
-        options.RegisterScopes(OpenIddictConstants.Permissions.Scopes.Email, OpenIddictConstants.Permissions.Scopes.Roles,OpenIddictConstants.Permissions.Scopes.Profile); //        
+        options.RegisterScopes(OpenIddictConstants.Permissions.Scopes.Email, OpenIddictConstants.Permissions.Scopes.Roles, OpenIddictConstants.Permissions.Scopes.Profile,
+             OpenIddictConstants.Scopes.OpenId); //        
 
 
         options.AddDevelopmentEncryptionCertificate()
@@ -75,7 +76,8 @@ builder.Services.AddOpenIddict()
                .EnableEndSessionEndpointPassthrough();//  
 
     })
-    .AddCore(options => { 
+    .AddCore(options =>
+    {
         options.UseEntityFrameworkCore() //  
                .UseDbContext<DBUser>();
     })
@@ -93,7 +95,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
-
+app.MapControllers();
 app.UseHttpsRedirection();
 
 app.UseRouting();

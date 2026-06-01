@@ -23,7 +23,7 @@ builder.Services.AddAuthentication(o =>
         o.LoginPath = "/login";
         o.LogoutPath = "/outlogin";
         o.ExpireTimeSpan = TimeSpan.FromMinutes(50);
-        o.SlidingExpiration=false;
+        o.SlidingExpiration = false;
     });
 
 
@@ -50,15 +50,15 @@ builder.Services.AddOpenIddict()
 
     o.AddRegistration(new OpenIddict.Client.OpenIddictClientRegistration
     {
-        Issuer =new Uri("https://localhost:7210/", UriKind.Absolute),
-        ClientId="mvc",
+        Issuer = new Uri("https://localhost:7210/", UriKind.Absolute),
+        ClientId = "mvc",
         ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654",
-        Scopes = {OpenIddictConstants.Scopes.Profile,OpenIddictConstants.Scopes.OpenId},
-        RedirectUri=new Uri("callback/login/local", UriKind.Relative),
-        PostLogoutRedirectUri=new Uri("callback/logout/local", UriKind.Relative)
-        
+        Scopes = { OpenIddictConstants.Scopes.Profile },
+        RedirectUri = new Uri("callback/login/local", UriKind.Relative),
+        PostLogoutRedirectUri = new Uri("callback/logout/local", UriKind.Relative)
+
     });
-    
+
 });
 builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();

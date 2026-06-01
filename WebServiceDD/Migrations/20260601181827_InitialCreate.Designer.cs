@@ -12,8 +12,8 @@ using WebServiceDD;
 namespace WebServiceDD.Migrations
 {
     [DbContext(typeof(DBUser))]
-    [Migration("20260517021406_AddUserpopopp")]
-    partial class AddUserpopopp
+    [Migration("20260601181827_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

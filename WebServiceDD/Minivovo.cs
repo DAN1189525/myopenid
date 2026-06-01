@@ -55,12 +55,12 @@ public class Minivovo:IHostedService
             
         }
         var socpeManager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
-        var scopeapi = await socpeManager.FindByNameAsync("mvc");
+        var scopeapi = await socpeManager.FindByNameAsync("profile");
         if (scopeapi == null)
         {
            await socpeManager.CreateAsync( new OpenIddictScopeDescriptor
             {
-                Name = "mvc",
+                Name = "profile",
                 DisplayName = "API Access",
                 Resources = { "email", "profile", "roles" }
             });
